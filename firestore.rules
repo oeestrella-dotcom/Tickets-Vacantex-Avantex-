@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function estaAutenticado() {
+      return request.auth != null;
+    }
+
+    function miPerfil() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data;
+    }
+
+    function tieneAcceso() {
+      return estaAutenticado()
+        && exists(/databases/$(database)/documents/usuarios/$(request.auth.uid))
+        && miPerfil().activo == true;
+    }
+
+    function esAdmin() {
+      return tieneAcceso() && miPerfil().rol == 'admin';
+    }
+
+    // Vacantes y movimientos: cualquier usuario activo (admin o supervisor) puede leer y escribir
+    match /vacantes/{id} {
+      allow read, write: if tieneAcceso();
+    }
+    match /movimientos/{id} {
+      allow read, write: if tieneAcceso();
+    }
+
+    // Configuración (catálogos, plantilla, umbral): todos leen, solo admin escribe
+    match /config/{id} {
+      allow read: if tieneAcceso();
+      allow write: if esAdmin();
+    }
+
+    // Usuarios del sistema: solo admin puede crear/editar perfiles de otros;
+    // cada quien puede leer su propio perfil para saber su rol al iniciar sesión
+    match /usuarios/{uid} {
+      allow read: if estaAutenticado();
+      allow create: if esAdmin() || (request.auth.uid == uid && !exists(/databases/$(database)/documents/usuarios/$(uid)));
+      allow update: if esAdmin();
+      allow delete: if esAdmin();
+    }
+  }
+}
+
+// Nota: la condición "!exists(...)" en /usuarios/{uid} permite que la PRIMERA persona
+// que use el sistema (cuando la colección "usuarios" está vacía) pueda crear su propio
+// perfil de administrador. Después de eso, solo un administrador puede dar de alta a
+// más gente. Si quieres cerrar incluso ese primer paso (por ejemplo, ya diste de alta
+// al primer admin manualmente desde la consola de Firebase), puedes cambiar esa línea a:
+// allow create: if esAdmin();

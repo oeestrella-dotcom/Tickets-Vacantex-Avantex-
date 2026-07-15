@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Vacantes y Rotación · Grupo Avantex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#0E1B33;
+    --navy-800:#1B2A4A;
+    --navy-700:#243759;
+    --blue-500:#3B6EA5;
+    --gold-500:#C9A227;
+    --gold-100:#F6EFD8;
+    --bg:#F5F6F8;
+    --card:#FFFFFF;
+    --line:#E4E7ED;
+    --ink:#1C2333;
+    --muted:#6B7280;
+    --ok:#2E7D5B;
+    --ok-bg:#E7F3ED;
+    --warn:#B8860B;
+    --warn-bg:#FBF1DA;
+    --danger:#B23A2F;
+    --danger-bg:#FBEAE7;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;}
+  .app{max-width:1180px;margin:0 auto;padding:0 20px 60px;}
+
+  /* Header */
+  header.top{background:linear-gradient(135deg,var(--navy-950),var(--navy-800) 70%);color:#fff;margin:0 0 24px;padding:28px 20px 22px;border-radius:0 0 16px 16px;}
+  header.top .inner{max-width:1140px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+  .brand-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-500);margin:0 0 6px;}
+  h1.brand-title{font-family:'Fraunces',serif;font-weight:600;font-size:28px;margin:0;letter-spacing:-.01em;}
+  .brand-sub{color:#C7D0E0;font-size:13px;margin-top:4px;}
+  .header-clock{font-family:'JetBrains Mono',monospace;font-size:12px;color:#C7D0E0;text-align:right;}
+  .header-clock strong{display:block;color:#fff;font-size:15px;font-weight:600;}
+
+  /* Tabs */
+  nav.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:22px;flex-wrap:wrap;}
+  nav.tabs button{flex:1;min-width:120px;background:transparent;border:none;padding:10px 14px;border-radius:8px;font-family:'Inter';font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.15s;}
+  nav.tabs button:hover{background:#F0F2F6;color:var(--ink);}
+  nav.tabs button.active{background:var(--navy-800);color:#fff;}
+
+  .view{display:none;animation:fade .25s ease;}
+  .view.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  /* KPI cards */
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:24px;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;}
+  .kpi::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--blue-500);}
+  .kpi.gold::before{background:var(--gold-500);}
+  .kpi.ok::before{background:var(--ok);}
+  .kpi.danger::before{background:var(--danger);}
+  .kpi-label{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+  .kpi-value{font-family:'Fraunces',serif;font-size:32px;font-weight:600;margin-top:6px;color:var(--navy-800);}
+  .kpi-note{font-size:12px;color:var(--muted);margin-top:4px;}
+
+  section.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:20px;}
+  .card h2{font-family:'Fraunces',serif;font-size:18px;margin:0 0 4px;color:var(--navy-800);}
+  .card .card-sub{font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+
+  /* Forms */
+  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;align-items:end;}
+  label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;}
+  input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-family:'Inter';font-size:13.5px;background:#FCFCFD;color:var(--ink);}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--blue-500);outline-offset:1px;border-color:var(--blue-500);}
+  .btn{border:none;border-radius:8px;padding:10px 16px;font-weight:600;font-size:13.5px;cursor:pointer;font-family:'Inter';transition:.15s;}
+  .btn-primary{background:var(--navy-800);color:#fff;}
+  .btn-primary:hover{background:var(--navy-700);}
+  .btn-gold{background:var(--gold-500);color:var(--navy-950);}
+  .btn-gold:hover{filter:brightness(1.05);}
+  .btn-ghost{background:transparent;color:var(--navy-800);border:1px solid var(--line);}
+  .btn-ghost:hover{background:#F0F2F6;}
+  .btn-sm{padding:6px 10px;font-size:12px;border-radius:6px;}
+  .btn-danger{background:var(--danger-bg);color:var(--danger);}
+
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:8px 10px;border-bottom:2px solid var(--line);font-weight:700;}
+  td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  tr:hover td{background:#FAFBFC;}
+  .empty-state{text-align:center;padding:36px 20px;color:var(--muted);}
+  .empty-state strong{display:block;color:var(--ink);font-family:'Fraunces',serif;font-size:16px;margin-bottom:4px;}
+
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:700;}
+  .badge.abierta{background:var(--warn-bg);color:var(--warn);}
+  .badge.cubierta{background:var(--ok-bg);color:var(--ok);}
+  .badge.cancelada{background:var(--danger-bg);color:var(--danger);}
+  .badge.alta{background:var(--ok-bg);color:var(--ok);}
+  .badge.baja{background:var(--danger-bg);color:var(--danger);}
+  .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+  .aging{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:12.5px;}
+  .aging .dot{width:7px;height:7px;}
+  .aging.green{color:var(--ok);}
+  .aging.amber{color:var(--warn);}
+  .aging.red{color:var(--danger);}
+
+  .unit-tag{font-size:11.5px;font-weight:600;color:var(--navy-800);background:#EEF1F7;padding:2px 8px;border-radius:5px;}
+  .client-tag{font-size:11.5px;font-weight:600;color:#5A3E00;background:var(--gold-100);padding:2px 8px;border-radius:5px;}
+
+  .alert-card{border:1px solid #E9DCAE;background:var(--gold-100);border-radius:var(--radius);padding:16px 18px;margin-bottom:20px;}
+  .alert-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #E9DCAE;}
+  .alert-row:last-child{border-bottom:none;}
+  .alert-info{font-size:13px;}
+  .alert-info strong{display:block;color:var(--navy-800);}
+  .alert-meta{font-size:11.5px;color:#7A5E10;margin-top:2px;}
+  .sent-tag{font-size:11px;color:var(--ok);font-weight:600;}
+
+  /* Modal */
+  .modal-bg{display:none;position:fixed;inset:0;background:rgba(14,27,51,.55);align-items:center;justify-content:center;z-index:50;padding:16px;}
+  .modal-bg.show{display:flex;}
+  .modal{background:#fff;border-radius:12px;padding:22px;max-width:420px;width:100%;}
+  .modal h3{font-family:'Fraunces',serif;margin:0 0 14px;font-size:18px;color:var(--navy-800);}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+
+  .period-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .period-btns button.active{background:var(--navy-800);color:#fff;border-color:var(--navy-800);}
+
+  .report-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;}
+  @media(max-width:820px){.report-grid{grid-template-columns:1fr;}}
+
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .bar-label{width:92px;font-size:12px;font-weight:600;flex-shrink:0;}
+  .bar-track{flex:1;height:16px;background:#EEF1F7;border-radius:4px;overflow:hidden;display:flex;}
+  .bar-fill{height:100%;}
+  .bar-fill.alta{background:var(--ok);}
+  .bar-fill.baja{background:var(--danger);}
+  .bar-val{width:30px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--muted);}
+
+  .note-box{background:var(--gold-100);border:1px solid #E9DCAE;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#7A5E10;margin-top:6px;}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy-950);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;z-index:100;opacity:0;transition:opacity .25s;pointer-events:none;}
+  .toast.show{opacity:1;}
+  .loading-row{color:var(--muted);text-align:center;padding:20px;}
+  .flex-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  .small-link{background:none;border:none;color:var(--blue-500);font-size:12px;font-weight:600;cursor:pointer;padding:0;}
+
+  /* Auth */
+  #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy-950),var(--navy-800) 70%);padding:20px;}
+  .login-box{background:#fff;border-radius:14px;padding:32px;max-width:380px;width:100%;}
+  .login-box .brand-eyebrow{color:var(--gold-500);}
+  .login-box h1{font-family:'Fraunces',serif;font-size:22px;color:var(--navy-800);margin:6px 0 4px;}
+  .login-box p.sub{font-size:12.5px;color:var(--muted);margin-bottom:20px;}
+  .login-error{background:var(--danger-bg);color:var(--danger);font-size:12.5px;padding:8px 10px;border-radius:6px;margin-top:10px;display:none;}
+  .login-error.show{display:block;}
+  #appRoot{display:none;}
+  .user-chip{display:flex;align-items:center;gap:10px;}
+  .role-badge{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:12px;background:rgba(201,162,39,.2);color:var(--gold-500);}
+  .logout-btn{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11.5px;font-weight:600;cursor:pointer;}
+  .logout-btn:hover{background:rgba(255,255,255,.22);}
+  .pw-reveal{font-family:'JetBrains Mono',monospace;background:var(--navy-950);color:#fff;padding:10px 12px;border-radius:8px;font-size:13px;letter-spacing:.03em;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;}
+  .security-note{background:var(--danger-bg);border:1px solid #E8C9C3;color:var(--danger);border-radius:8px;padding:10px 12px;font-size:12px;margin-bottom:16px;}
+  .user-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  @media(max-width:640px){
+    header.top{padding:20px 16px 16px;}
+    h1.brand-title{font-size:22px;}
+    .header-clock{text-align:left;width:100%;}
+    .header-clock .user-chip{justify-content:flex-start !important;}
+    nav.tabs button{min-width:100px;font-size:12.5px;padding:9px 8px;}
+    .kpi-value{font-size:26px;}
+    table{font-size:12px;}
+    th,td{padding:8px 6px;}
+  }
+  .user-row:last-child{border-bottom:none;}
+  .config-warning{background:#FBEAE7;border:1px solid #E8C9C3;color:#8A2E24;border-radius:10px;padding:16px;max-width:480px;margin:16px auto 0;font-size:13px;text-align:left;}
+  .config-warning code{background:#fff;padding:2px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px;}
+</style>
+
+<!-- Firebase (necesario para que los datos y usuarios se compartan entre dispositivos al hospedar esto fuera de Claude) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="firebase-config.js"></script>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <p class="brand-eyebrow">Grupo Avantex · Organizacional / RRHH</p>
+    <h1>Sistema de Vacantes y Rotación</h1>
+    <p class="sub" id="loginSub">Ingresa con tu correo corporativo y contraseña.</p>
+
+    <div id="loginFormWrap">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><label>Correo corporativo</label><input type="email" id="loginEmail" placeholder="nombre@avantex.com"></div>
+        <div><label>Contraseña</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="doLogin()">Entrar</button>
+      <div class="login-error" id="loginError"></div>
+    </div>
+
+    <div id="setupFormWrap" style="display:none;">
+      <p class="sub" style="margin-top:-8px;">Aún no hay usuarios en el sistema. Crea la cuenta de administrador.</p>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div><label>Tu nombre</label><input id="setupNombre" placeholder="Nombre completo"></div>
+        <div><label>Correo corporativo</label><input type="email" id="setupEmail" placeholder="nombre@avantex.com"></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="crearPrimerAdmin()">Crear cuenta de administrador</button>
+      <div class="login-error" id="setupError"></div>
+    </div>
+
+    <div id="configWarning" class="config-warning" style="display:none;">
+      <strong>Falta configurar Firebase.</strong> Este archivo necesita su propio proyecto gratuito de Firebase para guardar datos y usuarios. Abre <code>firebase-config.js</code> y pega ahí los datos de tu proyecto. Revisa el <code>README.md</code> incluido para el paso a paso.
+    </div>
+  </div>
+</div>
+
+<div class="app" id="appRoot">
+  <header class="top">
+    <div class="inner">
+      <div>
+        <p class="brand-eyebrow">Grupo Avantex · Organizacional / RRHH</p>
+        <h1 class="brand-title">Sistema de Vacantes y Rotación</h1>
+        <p class="brand-sub">Captura nacional de vacantes · altas y bajas · reporteo semanal y mensual</p>
+      </div>
+      <div class="header-clock">
+        <strong id="clockDate">—</strong>
+        <span id="clockUsers">Datos compartidos entre todos los colaboradores</span>
+        <div class="user-chip" style="justify-content:flex-end;margin-top:8px;">
+          <span id="userChipName"></span>
+          <span class="role-badge" id="userChipRole"></span>
+          <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button data-view="dashboard" class="active">Dashboard</button>
+    <button data-view="vacantes">Vacantes</button>
+    <button data-view="movimientos">Altas / Bajas</button>
+    <button data-view="reportes">Reportes</button>
+    <button data-view="config" data-role="admin">Configuración</button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="loading-row">Cargando indicadores…</div>
+    </div>
+
+    <div class="alert-card" id="alertCard">
+      <div class="flex-between">
+        <div>
+          <h2 style="margin:0;font-size:16px;">🔔 Alertas para reclutadores</h2>
+          <p class="card-sub" style="margin:4px 0 0;">Vacantes que requieren enviar aviso por correo</p>
+        </div>
+      </div>
+      <div id="alertList" style="margin-top:10px;"></div>
+    </div>
+
+    <section class="card">
+      <div class="flex-between">
+        <div>
+          <h2>Vacantes abiertas por antigüedad</h2>
+          <p class="card-sub">Ordenadas de mayor a menor días transcurridos desde su apertura</p>
+        </div>
+      </div>
+      <div id="dashVacantesTable"><div class="loading-row">Cargando…</div></div>
+    </section>
+
+    <section class="card">
+      <h2>Vacantes por unidad de negocio</h2>
+      <p class="card-sub">Vacantes activas al día de hoy</p>
+      <div id="dashUnitBars"><div class="loading-row">Cargando…</div></div>
+    </section>
+  </div>
+
+  <!-- VACANTES -->
+  <div class="view" id="view-vacantes">
+    <section class="card">
+      <h2>Registrar nueva vacante</h2>
+      <p class="card-sub">Cualquier colaborador puede abrir una vacante desde aquí — visible para toda la organización</p>
+      <div class="form-grid">
+        <div>
+          <label>Nombre del puesto</label>
+          <select id="vPuesto" onchange="togglePuestoOtro()"></select>
+        </div>
+        <div id="vPuestoOtroWrap" style="display:none;">
+          <label>Especifica el puesto</label>
+          <input id="vPuestoOtro" placeholder="Ej. Analista de Nómina">
+        </div>
+        <div>
+          <label>Unidad de negocio</label>
+          <select id="vUnidad"></select>
+        </div>
+        <div>
+          <label>Cliente</label>
+          <select id="vCliente" onchange="toggleClienteOtro()"></select>
+        </div>
+        <div id="vClienteOtroWrap" style="display:none;">
+          <label>Especifica el cliente</label>
+          <input id="vClienteOtro" placeholder="Nombre del cliente">
+        </div>
+        <div>
+          <label>Líder / Supervisor solicitante</label>
+          <input id="vLider" placeholder="Nombre del líder">
+        </div>
+        <div>
+          <label>Correo del reclutador a cargo</label>
+          <input type="email" id="vReclutadorEmail" placeholder="reclutador@avantex.com">
+        </div>
+        <div>
+          <label>Fecha de apertura</label>
+          <input type="date" id="vFecha">
+        </div>
+        <div>
+          <button class="btn btn-primary" onclick="crearVacante()">+ Registrar vacante</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="flex-between">
+        <div>
+          <h2>Vacantes registradas</h2>
+          <p class="card-sub" id="vacantesCount">—</p>
+        </div>
+        <select id="filtroEstatusVac" onchange="renderVacantesTab()" style="width:160px;">
+          <option value="todas">Todas</option>
+          <option value="abierta" selected>Solo abiertas</option>
+          <option value="cubierta">Cubiertas</option>
+          <option value="cancelada">Canceladas</option>
+        </select>
+      </div>
+      <div id="vacantesTable"><div class="loading-row">Cargando…</div></div>
+    </section>
+  </div>
+
+  <!-- MOVIMIENTOS -->
+  <div class="view" id="view-movimientos">
+    <section class="card">
+      <h2>Registrar movimiento de personal</h2>
+      <p class="card-sub">Altas (ingresos) y bajas (salidas) de colaboradores, independiente del ciclo de vacantes</p>
+      <div class="form-grid">
+        <div>
+          <label>Tipo de movimiento</label>
+          <select id="mTipo">
+            <option value="alta">Alta (ingreso)</option>
+            <option value="baja">Baja (salida)</option>
+          </select>
+        </div>
+        <div>
+          <label>Nombre del colaborador</label>
+          <input id="mEmpleado" placeholder="Nombre completo">
+        </div>
+        <div>
+          <label>Puesto</label>
+          <input id="mPuesto" placeholder="Nombre del puesto">
+        </div>
+        <div>
+          <label>Unidad de negocio</label>
+          <select id="mUnidad"></select>
+        </div>
+        <div>
+          <label>Líder / Supervisor</label>
+          <input id="mLider" placeholder="Nombre del líder">
+        </div>
+        <div>
+          <label>Fecha del movimiento</label>
+          <input type="date" id="mFecha">
+        </div>
+        <div id="mMotivoWrap" style="display:none;">
+          <label>Motivo de baja</label>
+          <select id="mMotivo">
+            <option value="Renuncia voluntaria">Renuncia voluntaria</option>
+            <option value="Terminación por la empresa">Terminación por la empresa</option>
+            <option value="Fin de contrato">Fin de contrato</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div>
+          <button class="btn btn-primary" onclick="crearMovimiento()">+ Registrar movimiento</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="flex-between">
+        <div>
+          <h2>Historial de movimientos</h2>
+          <p class="card-sub" id="movCount">—</p>
+        </div>
+        <select id="filtroTipoMov" onchange="renderMovimientosTab()" style="width:140px;">
+          <option value="todos">Todos</option>
+          <option value="alta">Solo altas</option>
+          <option value="baja">Solo bajas</option>
+        </select>
+      </div>
+      <div id="movimientosTable"><div class="loading-row">Cargando…</div></div>
+    </section>
+  </div>
+
+  <!-- REPORTES -->
+  <div class="view" id="view-reportes">
+    <section class="card">
+      <h2>Periodo del reporte</h2>
+      <div class="period-btns" id="periodBtns">
+        <button class="btn btn-ghost active" data-period="semana">Esta semana</button>
+        <button class="btn btn-ghost" data-period="mes">Este mes</button>
+        <button class="btn btn-ghost" data-period="mesAnterior">Mes anterior</button>
+        <button class="btn btn-ghost" data-period="custom">Rango personalizado</button>
+      </div>
+      <div class="form-grid" id="customRangeWrap" style="display:none;max-width:400px;">
+        <div><label>Desde</label><input type="date" id="repDesde"></div>
+        <div><label>Hasta</label><input type="date" id="repHasta"></div>
+        <div><button class="btn btn-primary" onclick="renderReportes()">Aplicar</button></div>
+      </div>
+    </section>
+
+    <div class="report-grid">
+      <section class="card">
+        <h2>Resumen del periodo</h2>
+        <p class="card-sub" id="repRangoLabel">—</p>
+        <div class="kpi-grid" id="repKpis" style="margin-bottom:6px;"></div>
+        <div id="repRotacionNote"></div>
+      </section>
+
+      <section class="card">
+        <h2>Altas y bajas por unidad</h2>
+        <p class="card-sub">Movimientos registrados en el periodo</p>
+        <div id="repBars"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Vacantes abiertas en el periodo</h2>
+      <p class="card-sub">Nuevas solicitudes de vacante creadas dentro del rango seleccionado</p>
+      <div id="repVacantesTable"><div class="loading-row">Cargando…</div></div>
+    </section>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="view" id="view-config">
+    <section class="card">
+      <h2>Puestos</h2>
+      <p class="card-sub">Catálogo de nombres de puesto disponibles al registrar una vacante. Los colaboradores solo eligen de esta lista (o "Otro" si no está).</p>
+      <div style="display:flex;gap:8px;max-width:420px;margin-bottom:14px;">
+        <input id="nuevoPuesto" placeholder="Nombre del puesto">
+        <button class="btn btn-ghost" onclick="agregarPuesto()">+ Agregar</button>
+      </div>
+      <div id="puestosList"></div>
+    </section>
+
+    <section class="card">
+      <h2>Usuarios del sistema</h2>
+      <div class="security-note">
+        <strong>Sobre la seguridad:</strong> las contraseñas ya no se guardan en texto — las administra Firebase Authentication (el mismo sistema de autenticación de Google), cifradas y fuera del alcance de cualquiera, incluido tú como administrador. Al "resetear" la contraseña de alguien, en vez de generarle una nueva a la vista, el sistema le envía un correo de Firebase para que la persona misma defina una nueva — es el estándar de la industria. Aun así, este sigue siendo un control de acceso para uso interno, no una plataforma con auditorías o SSO de nivel empresarial.
+      </div>
+      <p class="card-sub">Da de alta a cada supervisor con su correo corporativo como usuario. El sistema genera la contraseña automáticamente y te la muestra una sola vez para que se la compartas.</p>
+      <div class="form-grid">
+        <div>
+          <label>Nombre del supervisor</label>
+          <input id="nuevoUsuarioNombre" placeholder="Nombre completo">
+        </div>
+        <div>
+          <label>Correo corporativo (usuario)</label>
+          <input type="email" id="nuevoUsuarioEmail" placeholder="nombre@avantex.com">
+        </div>
+        <div>
+          <label>Rol</label>
+          <select id="nuevoUsuarioRol">
+            <option value="supervisor">Supervisor (usuario)</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div>
+          <button class="btn btn-primary" onclick="agregarUsuario()">+ Crear usuario</button>
+        </div>
+      </div>
+      <div id="nuevaPasswordBox"></div>
+      <div id="usuariosList" style="margin-top:16px;"></div>
+    </section>
+
+    <section class="card">
+      <h2>Clientes</h2>
+      <p class="card-sub">Lista de clientes disponible al registrar una vacante. Agrega o quita según cambien tus cuentas.</p>
+      <div style="display:flex;gap:8px;max-width:420px;margin-bottom:14px;">
+        <input id="nuevoCliente" placeholder="Nombre del cliente">
+        <button class="btn btn-ghost" onclick="agregarCliente()">+ Agregar</button>
+      </div>
+      <div id="clientesList"></div>
+    </section>
+
+    <section class="card">
+      <h2>Unidades de negocio</h2>
+      <p class="card-sub">Aromatex, Pestex y Weldex vienen precargadas. Agrega otras si las necesitas.</p>
+      <div style="display:flex;gap:8px;max-width:420px;margin-bottom:14px;">
+        <input id="nuevaUnidad" placeholder="Nombre de la unidad">
+        <button class="btn btn-ghost" onclick="agregarUnidad()">+ Agregar</button>
+      </div>
+      <div id="unidadesList"></div>
+    </section>
+
+    <section class="card">
+      <h2>Plantilla promedio por unidad</h2>
+      <p class="card-sub">Opcional — se usa para calcular el % de rotación (bajas ÷ plantilla × 100). Sin este dato, los reportes muestran solo conteos.</p>
+      <div id="headcountForm"></div>
+      <button class="btn btn-primary" style="margin-top:10px;" onclick="guardarHeadcount()">Guardar plantilla</button>
+    </section>
+
+    <section class="card">
+      <h2>Alertas por correo</h2>
+      <p class="card-sub">Este sistema no puede enviar correos de forma automática y silenciosa desde el navegador (no tiene un servidor detrás). Lo que sí hace: te avisa en el Dashboard qué vacantes necesitan aviso y te prepara el correo listo — solo das clic en "Enviar" y se abre en tu programa de correo (Outlook, Gmail, etc.) ya redactado y dirigido al reclutador. Define aquí a partir de cuántos días quieres que aparezca esa alerta.</p>
+      <div class="form-grid" style="max-width:420px;">
+        <div>
+          <label>Alertar a partir de (días)</label>
+          <input type="number" min="1" id="umbralAlerta" placeholder="7">
+        </div>
+        <div>
+          <button class="btn btn-primary" onclick="guardarUmbral()">Guardar umbral</button>
+        </div>
+      </div>
+      <div class="note-box" style="margin-top:14px;">Este panel te dice qué avisar y te deja el correo listo con un clic — pero que salga solo, todos los días, sin que nadie abra la app, requeriría una tarea programada (Cloud Functions con temporizador), que en Firebase ya pide activar el plan de pago por uso (aunque el uso normal de esto se quede en $0). Si más adelante te interesa, te ayudo a dejarlo armado.</div>
+    </section>
+
+    <section class="card">
+      <h2>Acerca de este hospedaje</h2>
+      <p class="card-sub">Cómo está armado este sistema para que puedas mantenerlo</p>
+      <p style="font-size:12.5px;color:var(--muted);">Este archivo está hospedado como página estática (por ejemplo en GitHub Pages) y usa <strong>Firebase</strong> (plan gratuito Spark) como base de datos y autenticación, para que los datos y usuarios se compartan entre cualquier computadora o celular con solo el enlace, usuario y contraseña. Revisa el archivo <code>README.md</code> del repositorio para el paso a paso de configuración inicial.</p>
+    </section>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalCerrar">
+  <div class="modal">
+    <h3 id="modalTitle">Cerrar vacante</h3>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <label>Estatus final</label>
+        <select id="cierreEstatus">
+          <option value="cubierta">Cubierta</option>
+          <option value="cancelada">Cancelada</option>
+        </select>
+      </div>
+      <div>
+        <label>Fecha de cierre</label>
+        <input type="date" id="cierreFecha">
+      </div>
+      <div>
+        <label>Nota (opcional)</label>
+        <input id="cierreNota" placeholder="Ej. Candidato interno, se canceló por presupuesto...">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarCierre()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   Sistema de Vacantes y Rotación · Grupo Avantex
+   Versión para hospedar fuera de Claude (GitHub Pages + Firebase)
+   ============================================================ */
+let db, auth, secondaryApp;
+let vacantes = [];
+let movimientos = [];
+let usuarios = [];
+let config = {
+  unidades: ['Aromatex','Pestex','Weldex'],
+  clientes: ['AFIRME','HIMALAYA','LOS CAMPESTRES','VILLACERO','AUDI','ALFONSINO','COLEGIO NEXXUS','IOS','MG','ACERO PRIME','ABOGADOS','ALMAC. MEZQUITAL','Schening Industrias','Banco Shinhan','CONSTANCIO','FARMACIAS SAN PABLO','OTRA'],
+  puestos: [],
+  headcount: {},
+  umbralAlerta: 7
+};
+let currentUser = null;
+let vacanteEnCierre = null;
+let unsubVacantes=null, unsubMovimientos=null, unsubConfig=null, unsubUsuarios=null;
+
+const todayStr = () => new Date().toISOString().slice(0,10);
+const fmtDate = (s) => { if(!s) return '—'; const d = new Date(s+'T00:00:00'); return d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'}); };
+const daysBetween = (a,b) => Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00'))/86400000);
+const normEmail = (e) => (e||'').trim().toLowerCase();
+const validEmail = (e) => /^\S+@\S+\.\S+$/.test(e);
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+/* ---------- ARRANQUE Y AUTENTICACIÓN ---------- */
+function initFirebase(){
+  if(typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey){
+    document.getElementById('configWarning').style.display='block';
+    document.getElementById('loginFormWrap').style.display='none';
+    document.getElementById('setupFormWrap').style.display='none';
+    return false;
+  }
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.firestore();
+  return true;
+}
+
+async function init(){
+  if(!initFirebase()) return;
+  try{
+    const snap = await db.collection('usuarios').limit(1).get();
+    if(snap.empty){
+      document.getElementById('loginFormWrap').style.display='none';
+      document.getElementById('setupFormWrap').style.display='block';
+      document.getElementById('loginSub').textContent='Primer ingreso — configura la cuenta de administrador.';
+    }
+  }catch(e){ console.error('No se pudo verificar usuarios existentes', e); }
+  auth.onAuthStateChanged(handleAuthChange);
+}
+
+async function handleAuthChange(user){
+  if(!user){ currentUser=null; showLogin(); return; }
+  try{
+    const doc = await db.collection('usuarios').doc(user.uid).get();
+    if(!doc.exists || doc.data().activo===false){
+      await auth.signOut();
+      mostrarErrorLogin('loginError','Tu cuenta no existe o está desactivada. Contacta a un administrador.');
+      return;
+    }
+    currentUser = { uid:user.uid, ...doc.data() };
+    entrarComo();
+  }catch(e){
+    console.error(e);
+    mostrarErrorLogin('loginError','No se pudo verificar tu cuenta. Intenta de nuevo.');
+  }
+}
+
+function mostrarErrorLogin(elId, msg){
+  const el = document.getElementById(elId);
+  el.textContent = msg;
+  el.classList.add('show');
+}
+
+function generatePassword(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
+  let pw = '';
+  for(let i=0;i<10;i++) pw += chars[Math.floor(Math.random()*chars.length)];
+  return pw;
+}
+
+async function crearPrimerAdmin(){
+  const nombre = document.getElementById('setupNombre').value.trim();
+  const email = normEmail(document.getElementById('setupEmail').value);
+  const errEl = document.getElementById('setupError');
+  errEl.classList.remove('show');
+  if(!nombre || !validEmail(email)){
+    errEl.textContent = 'Ingresa tu nombre y un correo corporativo válido.';
+    errEl.classList.add('show');
+    return;
+  }
+  const password = generatePassword();
+  try{
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    await db.collection('usuarios').doc(cred.user.uid).set({ nombre, email, rol:'admin', activo:true, creado: todayStr() });
+    alert(`Cuenta de administrador creada.\n\nUsuario: ${email}\nContraseña: ${password}\n\nGuárdala en un lugar seguro — no se volverá a mostrar. Ya quedaste dentro del sistema.`);
+  }catch(e){
+    console.error(e);
+    let msg = 'No se pudo crear la cuenta de administrador.';
+    if(e.code==='auth/email-already-in-use') msg = 'Ya existe una cuenta con ese correo — intenta iniciar sesión.';
+    errEl.textContent = msg;
+    errEl.classList.add('show');
+  }
+}
+
+async function doLogin(){
+  const email = normEmail(document.getElementById('loginEmail').value);
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.classList.remove('show');
+  try{
+    await auth.signInWithEmailAndPassword(email, password);
+  }catch(e){
+    console.error(e);
+    errEl.textContent = 'Usuario o contraseña incorrectos.';
+    errEl.classList.add('show');
+  }
+}
+
+function doLogout(){
+  auth.signOut();
+}
+
+function showLogin(){
+  document.getElementById('appRoot').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginPassword').value='';
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+  const dash = document.querySelector('nav.tabs button[data-view="dashboard"]');
+  if(dash) dash.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-dashboard').classList.add('active');
+  if(unsubVacantes){ unsubVacantes(); unsubVacantes=null; }
+  if(unsubMovimientos){ unsubMovimientos(); unsubMovimientos=null; }
+  if(unsubConfig){ unsubConfig(); unsubConfig=null; }
+  if(unsubUsuarios){ unsubUsuarios(); unsubUsuarios=null; }
+}
+
+function entrarComo(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appRoot').style.display='block';
+  document.getElementById('userChipName').textContent = currentUser.nombre || currentUser.email;
+  document.getElementById('userChipRole').textContent = currentUser.rol === 'admin' ? 'Administrador' : 'Supervisor';
+  document.querySelectorAll('nav.tabs button[data-role="admin"]').forEach(b=>{
+    b.style.display = currentUser.rol === 'admin' ? '' : 'none';
+  });
+  attachListeners();
+}
+
+function attachListeners(){
+  if(unsubVacantes) unsubVacantes();
+  if(unsubMovimientos) unsubMovimientos();
+  if(unsubConfig) unsubConfig();
+  if(unsubUsuarios) unsubUsuarios();
+
+  unsubVacantes = db.collection('vacantes').onSnapshot(snap=>{
+    vacantes = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    renderAll();
+  }, err=>{ console.error(err); toast('No se pudieron cargar las vacantes'); });
+
+  unsubMovimientos = db.collection('movimientos').onSnapshot(snap=>{
+    movimientos = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    renderAll();
+  }, err=>{ console.error(err); toast('No se pudieron cargar los movimientos'); });
+
+  unsubConfig = db.collection('config').doc('general').onSnapshot(snap=>{
+    if(snap.exists){
+      const loaded = snap.data();
+      config = { ...config, ...loaded };
+      if(!config.clientes || !config.clientes.length) config.clientes = ['AFIRME','HIMALAYA','LOS CAMPESTRES','VILLACERO','AUDI','ALFONSINO','COLEGIO NEXXUS','IOS','MG','ACERO PRIME','ABOGADOS','ALMAC. MEZQUITAL','Schening Industrias','Banco Shinhan','CONSTANCIO','FARMACIAS SAN PABLO','OTRA'];
+      if(!config.puestos) config.puestos = [];
+      if(!config.umbralAlerta) config.umbralAlerta = 7;
+    }
+    populateUnidadSelects();
+    renderAll();
+  }, err=>{ console.error(err); toast('No se pudo cargar la configuración'); });
+
+  if(currentUser.rol==='admin'){
+    unsubUsuarios = db.collection('usuarios').onSnapshot(snap=>{
+      usuarios = snap.docs.map(d=>({id:d.id, ...d.data()}));
+      renderConfigTab();
+    }, err=>console.error(err));
+  }
+}
+
+async function saveConfig(){
+  try{ await db.collection('config').doc('general').set(config, {merge:true}); }
+  catch(e){ console.error(e); toast('No se pudo guardar la configuración'); }
+}
+
+function populateUnidadSelects(){
+  const opts = config.unidades.map(u=>`<option value="${u}">${u}</option>`).join('');
+  document.getElementById('vUnidad').innerHTML = opts;
+  document.getElementById('mUnidad').innerHTML = opts;
+  const clienteOpts = config.clientes.map(c=>`<option value="${c}">${c}</option>`).join('');
+  document.getElementById('vCliente').innerHTML = clienteOpts;
+  const puestoOpts = config.puestos.map(p=>`<option value="${p}">${p}</option>`).join('')
+    + `<option value="OTRO">Otro (especificar)</option>`;
+  document.getElementById('vPuesto').innerHTML = puestoOpts;
+}
+
+function toggleClienteOtro(){
+  const val = document.getElementById('vCliente').value;
+  document.getElementById('vClienteOtroWrap').style.display = val==='OTRA' ? 'block' : 'none';
+}
+function togglePuestoOtro(){
+  const val = document.getElementById('vPuesto').value;
+  document.getElementById('vPuestoOtroWrap').style.display = val==='OTRO' ? 'block' : 'none';
+}
+
+/* ---------- VACANTES ---------- */
+async function crearVacante(){
+  let puesto = document.getElementById('vPuesto').value;
+  if(puesto==='OTRO'){ puesto = document.getElementById('vPuestoOtro').value.trim(); }
+  const unidad = document.getElementById('vUnidad').value;
+  let cliente = document.getElementById('vCliente').value;
+  if(cliente==='OTRA'){
+    const otro = document.getElementById('vClienteOtro').value.trim();
+    if(otro) cliente = otro;
+  }
+  const lider = document.getElementById('vLider').value.trim();
+  const reclutadorEmail = document.getElementById('vReclutadorEmail').value.trim();
+  const fecha = document.getElementById('vFecha').value || todayStr();
+  if(!puesto || !lider){ toast('Falta el nombre del puesto o del líder'); return; }
+  if(reclutadorEmail && !validEmail(reclutadorEmail)){ toast('El correo del reclutador no es válido'); return; }
+  try{
+    await db.collection('vacantes').add({
+      puesto, unidad, cliente, lider, reclutadorEmail,
+      fecha_apertura: fecha, status:'abierta', fecha_cierre:null, nota:'', ultimaAlerta:null,
+      creadoPor: currentUser.email
+    });
+    document.getElementById('vLider').value='';
+    document.getElementById('vReclutadorEmail').value=''; document.getElementById('vClienteOtro').value='';
+    document.getElementById('vPuestoOtro').value='';
+    document.getElementById('vFecha').value=''; document.getElementById('vClienteOtroWrap').style.display='none';
+    document.getElementById('vPuestoOtroWrap').style.display='none';
+    toast('Vacante registrada');
+  }catch(e){ console.error(e); toast('Error al guardar la vacante — revisa las reglas de Firestore'); }
+}
+
+function agingInfo(fechaApertura, fechaCierre){
+  const end = fechaCierre || todayStr();
+  const d = daysBetween(fechaApertura, end);
+  let cls = 'green';
+  if(d>30) cls='red'; else if(d>=15) cls='amber';
+  return {dias:d, cls};
+}
+
+function vacantesConAlerta(){
+  const umbral = config.umbralAlerta || 7;
+  return vacantes.filter(v=>{
+    if(v.status!=='abierta' || !v.reclutadorEmail) return false;
+    const dias = agingInfo(v.fecha_apertura).dias;
+    if(dias < umbral) return false;
+    if(v.ultimaAlerta && daysBetween(v.ultimaAlerta, todayStr()) < 1) return false;
+    return true;
+  }).sort((a,b)=> agingInfo(b.fecha_apertura).dias - agingInfo(a.fecha_apertura).dias);
+}
+
+function buildMailto(v){
+  const dias = agingInfo(v.fecha_apertura).dias;
+  const subject = `Vacante abierta ${dias} día(s) — ${v.puesto} (${v.cliente||'sin cliente'})`;
+  const body = `Hola,\n\nTe comparto seguimiento de la siguiente vacante:\n\n`+
+    `Puesto: ${v.puesto}\n`+
+    `Cliente: ${v.cliente||'—'}\n`+
+    `Unidad de negocio: ${v.unidad}\n`+
+    `Líder / Supervisor solicitante: ${v.lider}\n`+
+    `Fecha de apertura: ${fmtDate(v.fecha_apertura)}\n`+
+    `Días transcurridos: ${dias}\n\n`+
+    `Favor de darle seguimiento y actualizar su estatus.\n\nSaludos.`;
+  return `mailto:${encodeURIComponent(v.reclutadorEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+async function enviarAlerta(id){
+  const v = vacantes.find(x=>x.id===id);
+  if(!v || !v.reclutadorEmail){ toast('Esta vacante no tiene correo de reclutador'); return; }
+  window.location.href = buildMailto(v);
+  try{ await db.collection('vacantes').doc(id).update({ultimaAlerta: todayStr()}); }
+  catch(e){ console.error(e); }
+  toast('Se abrió tu programa de correo con el aviso listo');
+}
+
+function renderAlertas(){
+  const pendientes = vacantesConAlerta();
+  const el = document.getElementById('alertList');
+  const card = document.getElementById('alertCard');
+  if(pendientes.length===0){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  el.innerHTML = pendientes.map(v=>{
+    const dias = agingInfo(v.fecha_apertura).dias;
+    return `<div class="alert-row">
+      <div class="alert-info">
+        <strong>${v.puesto} · ${v.cliente||'sin cliente'}</strong>
+        <span class="alert-meta">${v.unidad} · ${v.lider} · lleva ${dias} día(s) abierta · para: ${v.reclutadorEmail}</span>
+        ${v.ultimaAlerta ? `<span class="sent-tag">Último aviso enviado: ${fmtDate(v.ultimaAlerta)}</span>` : ''}
+      </div>
+      <button class="btn btn-sm btn-gold" onclick="enviarAlerta('${v.id}')">✉️ Enviar aviso</button>
+    </div>`;
+  }).join('');
+}
+
+function abrirModalCierre(id){
+  vacanteEnCierre = id;
+  document.getElementById('cierreFecha').value = todayStr();
+  document.getElementById('cierreNota').value = '';
+  document.getElementById('modalCerrar').classList.add('show');
+}
+function cerrarModal(){ document.getElementById('modalCerrar').classList.remove('show'); vacanteEnCierre=null; }
+
+async function confirmarCierre(){
+  if(!vacanteEnCierre) return;
+  const estatus = document.getElementById('cierreEstatus').value;
+  const fecha = document.getElementById('cierreFecha').value || todayStr();
+  const nota = document.getElementById('cierreNota').value.trim();
+  try{
+    await db.collection('vacantes').doc(vacanteEnCierre).update({ status: estatus, fecha_cierre: fecha, nota });
+    toast('Vacante actualizada');
+  }catch(e){ console.error(e); toast('No se pudo actualizar'); }
+  cerrarModal();
+}
+
+function renderVacantesTab(){
+  const filtro = document.getElementById('filtroEstatusVac').value;
+  const rows = vacantes.filter(v => filtro==='todas' || v.status===filtro)
+    .sort((a,b)=> new Date(b.fecha_apertura) - new Date(a.fecha_apertura));
+  document.getElementById('vacantesCount').textContent = `${rows.length} vacante(s)`;
+  const el = document.getElementById('vacantesTable');
+  if(rows.length===0){ el.innerHTML = emptyState('Sin vacantes en este filtro','Registra una vacante arriba para empezar a darle seguimiento.'); return; }
+  el.innerHTML = `<div class="tbl-wrap"><table><thead><tr>
+    <th>Puesto</th><th>Cliente</th><th>Unidad</th><th>Líder / Supervisor</th><th>Apertura</th><th>Días</th><th>Estatus</th><th></th>
+  </tr></thead><tbody>
+  ${rows.map(v=>{
+    const ag = agingInfo(v.fecha_apertura, v.fecha_cierre);
+    const agingHtml = v.status==='abierta'
+      ? `<span class="aging ${ag.cls}"><span class="dot"></span>${ag.dias} día(s)</span>`
+      : `<span class="aging" style="color:var(--muted)">${ag.dias} día(s) totales</span>`;
+    return `<tr>
+      <td><strong>${v.puesto}</strong>${v.nota?`<div style="font-size:11.5px;color:var(--muted)">${v.nota}</div>`:''}</td>
+      <td>${v.cliente?`<span class="client-tag">${v.cliente}</span>`:'—'}</td>
+      <td><span class="unit-tag">${v.unidad}</span></td>
+      <td>${v.lider}</td>
+      <td>${fmtDate(v.fecha_apertura)}</td>
+      <td>${agingHtml}</td>
+      <td><span class="badge ${v.status}"><span class="dot"></span>${v.status}</span></td>
+      <td style="white-space:nowrap;">
+        ${v.status==='abierta' ? `<button class="btn btn-sm btn-gold" onclick="abrirModalCierre('${v.id}')">Cerrar</button>` : ''}
+        ${v.reclutadorEmail ? `<button class="btn btn-sm btn-ghost" onclick="enviarAlerta('${v.id}')">✉️ Avisar</button>` : ''}
+      </td>
+    </tr>`;
+  }).join('')}
+  </tbody></table></div>`;
+}
+
+/* ---------- MOVIMIENTOS ---------- */
+document.getElementById('mTipo').addEventListener('change', e=>{
+  document.getElementById('mMotivoWrap').style.display = e.target.value==='baja' ? 'block' : 'none';
+});
+
+async function crearMovimiento(){
+  const tipo = document.getElementById('mTipo').value;
+  const empleado = document.getElementById('mEmpleado').value.trim();
+  const puesto = document.getElementById('mPuesto').value.trim();
+  const unidad = document.getElementById('mUnidad').value;
+  const lider = document.getElementById('mLider').value.trim();
+  const fecha = document.getElementById('mFecha').value || todayStr();
+  const motivo = tipo==='baja' ? document.getElementById('mMotivo').value : '';
+  if(!empleado || !puesto || !lider){ toast('Completa nombre, puesto y líder'); return; }
+  try{
+    await db.collection('movimientos').add({ tipo, empleado, puesto, unidad, lider, fecha, motivo, creadoPor: currentUser.email });
+    ['mEmpleado','mPuesto','mLider'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('mFecha').value='';
+    toast('Movimiento registrado');
+  }catch(e){ console.error(e); toast('Error al guardar el movimiento — revisa las reglas de Firestore'); }
+}
+
+function renderMovimientosTab(){
+  const filtro = document.getElementById('filtroTipoMov').value;
+  const rows = movimientos.filter(m=> filtro==='todos' || m.tipo===filtro)
+    .sort((a,b)=> new Date(b.fecha) - new Date(a.fecha));
+  document.getElementById('movCount').textContent = `${rows.length} movimiento(s)`;
+  const el = document.getElementById('movimientosTable');
+  if(rows.length===0){ el.innerHTML = emptyState('Sin movimientos en este filtro','Registra una alta o baja arriba.'); return; }
+  el.innerHTML = `<div class="tbl-wrap"><table><thead><tr>
+    <th>Colaborador</th><th>Puesto</th><th>Unidad</th><th>Líder</th><th>Fecha</th><th>Tipo</th><th>Motivo</th>
+  </tr></thead><tbody>
+  ${rows.map(m=>`<tr>
+    <td><strong>${m.empleado}</strong></td>
+    <td>${m.puesto}</td>
+    <td><span class="unit-tag">${m.unidad}</span></td>
+    <td>${m.lider}</td>
+    <td>${fmtDate(m.fecha)}</td>
+    <td><span class="badge ${m.tipo}"><span class="dot"></span>${m.tipo}</span></td>
+    <td style="color:var(--muted)">${m.motivo||'—'}</td>
+  </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard(){
+  const abiertas = vacantes.filter(v=>v.status==='abierta');
+  const now = new Date(); const mesActual = now.toISOString().slice(0,7);
+  const altasMes = movimientos.filter(m=>m.tipo==='alta' && m.fecha.slice(0,7)===mesActual).length;
+  const bajasMes = movimientos.filter(m=>m.tipo==='baja' && m.fecha.slice(0,7)===mesActual).length;
+  const avgDias = abiertas.length ? Math.round(abiertas.reduce((s,v)=>s+agingInfo(v.fecha_apertura).dias,0)/abiertas.length) : 0;
+  const criticas = abiertas.filter(v=>agingInfo(v.fecha_apertura).dias>30).length;
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Vacantes abiertas</div><div class="kpi-value">${abiertas.length}</div><div class="kpi-note">Activas hoy a nivel nacional</div></div>
+    <div class="kpi gold"><div class="kpi-label">Días promedio abierta</div><div class="kpi-value">${avgDias}</div><div class="kpi-note">Antigüedad promedio de vacantes activas</div></div>
+    <div class="kpi ok"><div class="kpi-label">Altas del mes</div><div class="kpi-value">${altasMes}</div><div class="kpi-note">Ingresos registrados en ${mesLabel(mesActual)}</div></div>
+    <div class="kpi danger"><div class="kpi-label">Bajas del mes</div><div class="kpi-value">${bajasMes}</div><div class="kpi-note">Salidas registradas en ${mesLabel(mesActual)}</div></div>
+    <div class="kpi ${criticas>0?'danger':''}"><div class="kpi-label">Vacantes +30 días</div><div class="kpi-value">${criticas}</div><div class="kpi-note">Requieren atención prioritaria</div></div>
+  `;
+
+  const top = [...abiertas].sort((a,b)=> agingInfo(b.fecha_apertura).dias - agingInfo(a.fecha_apertura).dias).slice(0,8);
+  const tbl = document.getElementById('dashVacantesTable');
+  if(top.length===0){ tbl.innerHTML = emptyState('No hay vacantes abiertas','Cuando se registre una vacante aparecerá aquí, ordenada por antigüedad.'); }
+  else{
+    tbl.innerHTML = `<div class="tbl-wrap"><table><thead><tr><th>Puesto</th><th>Cliente</th><th>Unidad</th><th>Líder</th><th>Apertura</th><th>Días abierta</th></tr></thead><tbody>
+    ${top.map(v=>{ const ag = agingInfo(v.fecha_apertura); return `<tr>
+      <td><strong>${v.puesto}</strong></td><td>${v.cliente?`<span class="client-tag">${v.cliente}</span>`:'—'}</td><td><span class="unit-tag">${v.unidad}</span></td><td>${v.lider}</td><td>${fmtDate(v.fecha_apertura)}</td>
+      <td><span class="aging ${ag.cls}"><span class="dot"></span>${ag.dias} día(s)</span></td>
+    </tr>`}).join('')}
+    </tbody></table></div>`;
+  }
+
+  const barsEl = document.getElementById('dashUnitBars');
+  const maxCount = Math.max(1, ...config.unidades.map(u=>abiertas.filter(v=>v.unidad===u).length));
+  barsEl.innerHTML = config.unidades.map(u=>{
+    const c = abiertas.filter(v=>v.unidad===u).length;
+    const pct = Math.round((c/maxCount)*100);
+    return `<div class="bar-row"><div class="bar-label">${u}</div><div class="bar-track"><div class="bar-fill alta" style="width:${pct}%"></div></div><div class="bar-val">${c}</div></div>`;
+  }).join('');
+}
+
+function mesLabel(ym){
+  const [y,m] = ym.split('-');
+  return new Date(y, m-1, 1).toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+}
+
+function emptyState(title, sub){
+  return `<div class="empty-state"><strong>${title}</strong>${sub}</div>`;
+}
+
+/* ---------- REPORTES ---------- */
+let currentPeriod = 'semana';
+document.getElementById('periodBtns').addEventListener('click', e=>{
+  const btn = e.target.closest('button[data-period]');
+  if(!btn) return;
+  document.querySelectorAll('#periodBtns button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentPeriod = btn.dataset.period;
+  document.getElementById('customRangeWrap').style.display = currentPeriod==='custom' ? 'grid' : 'none';
+  if(currentPeriod!=='custom') renderReportes();
+});
+
+function getRange(){
+  const now = new Date();
+  if(currentPeriod==='semana'){
+    const day = now.getDay() || 7;
+    const monday = new Date(now); monday.setDate(now.getDate()-day+1);
+    return { desde: monday.toISOString().slice(0,10), hasta: todayStr(), label:'Semana actual (lunes a hoy)' };
+  }
+  if(currentPeriod==='mes'){
+    const first = new Date(now.getFullYear(), now.getMonth(), 1);
+    return { desde: first.toISOString().slice(0,10), hasta: todayStr(), label: 'Mes actual — '+mesLabel(todayStr().slice(0,7)) };
+  }
+  if(currentPeriod==='mesAnterior'){
+    const first = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    const last = new Date(now.getFullYear(), now.getMonth(), 0);
+    const ym = first.toISOString().slice(0,7);
+    return { desde: first.toISOString().slice(0,10), hasta: last.toISOString().slice(0,10), label: 'Mes anterior — '+mesLabel(ym) };
+  }
+  const desde = document.getElementById('repDesde').value || todayStr();
+  const hasta = document.getElementById('repHasta').value || todayStr();
+  return { desde, hasta, label: `${fmtDate(desde)} — ${fmtDate(hasta)}` };
+}
+
+function inRange(dateStr, desde, hasta){
+  return dateStr >= desde && dateStr <= hasta;
+}
+
+function renderReportes(){
+  const {desde, hasta, label} = getRange();
+  document.getElementById('repRangoLabel').textContent = label;
+
+  const altas = movimientos.filter(m=>m.tipo==='alta' && inRange(m.fecha, desde, hasta));
+  const bajas = movimientos.filter(m=>m.tipo==='baja' && inRange(m.fecha, desde, hasta));
+  const vacAbiertas = vacantes.filter(v=>inRange(v.fecha_apertura, desde, hasta));
+  const vacCerradas = vacantes.filter(v=>v.fecha_cierre && inRange(v.fecha_cierre, desde, hasta));
+  const cubiertasPeriodo = vacCerradas.filter(v=>v.status==='cubierta');
+  const avgFill = cubiertasPeriodo.length ? Math.round(cubiertasPeriodo.reduce((s,v)=>s+daysBetween(v.fecha_apertura, v.fecha_cierre),0)/cubiertasPeriodo.length) : null;
+
+  const totalHeadcount = Object.values(config.headcount||{}).reduce((s,n)=>s+(Number(n)||0),0);
+  const rotacionPct = totalHeadcount>0 ? ((bajas.length/totalHeadcount)*100).toFixed(1) : null;
+
+  document.getElementById('repKpis').innerHTML = `
+    <div class="kpi ok"><div class="kpi-label">Altas</div><div class="kpi-value">${altas.length}</div></div>
+    <div class="kpi danger"><div class="kpi-label">Bajas</div><div class="kpi-value">${bajas.length}</div></div>
+    <div class="kpi"><div class="kpi-label">Vacantes abiertas</div><div class="kpi-value">${vacAbiertas.length}</div></div>
+    <div class="kpi gold"><div class="kpi-label">Días prom. para cubrir</div><div class="kpi-value">${avgFill??'—'}</div></div>
+  `;
+
+  document.getElementById('repRotacionNote').innerHTML = rotacionPct!==null
+    ? `<div class="note-box"><strong>Índice de rotación del periodo: ${rotacionPct}%</strong><br>Calculado como bajas ÷ plantilla promedio configurada (${totalHeadcount} colaboradores) × 100.</div>`
+    : `<div class="note-box">Configura la plantilla promedio por unidad en <strong>Configuración</strong> para calcular el % de rotación. Por ahora se muestran conteos absolutos.</div>`;
+
+  const barsEl = document.getElementById('repBars');
+  const maxV = Math.max(1, ...config.unidades.map(u=>Math.max(
+    altas.filter(m=>m.unidad===u).length, bajas.filter(m=>m.unidad===u).length)));
+  barsEl.innerHTML = config.unidades.map(u=>{
+    const a = altas.filter(m=>m.unidad===u).length;
+    const b = bajas.filter(m=>m.unidad===u).length;
+    return `<div style="margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px;">${u}</div>
+      <div class="bar-row"><div class="bar-label" style="width:50px;color:var(--ok)">Altas</div><div class="bar-track"><div class="bar-fill alta" style="width:${(a/maxV)*100}%"></div></div><div class="bar-val">${a}</div></div>
+      <div class="bar-row"><div class="bar-label" style="width:50px;color:var(--danger)">Bajas</div><div class="bar-track"><div class="bar-fill baja" style="width:${(b/maxV)*100}%"></div></div><div class="bar-val">${b}</div></div>
+    </div>`;
+  }).join('');
+
+  const vtbl = document.getElementById('repVacantesTable');
+  if(vacAbiertas.length===0){ vtbl.innerHTML = emptyState('Sin vacantes nuevas en este periodo',''); }
+  else{
+    vtbl.innerHTML = `<div class="tbl-wrap"><table><thead><tr><th>Puesto</th><th>Unidad</th><th>Líder</th><th>Apertura</th><th>Estatus actual</th></tr></thead><tbody>
+    ${vacAbiertas.map(v=>`<tr>
+      <td><strong>${v.puesto}</strong></td><td><span class="unit-tag">${v.unidad}</span></td><td>${v.lider}</td><td>${fmtDate(v.fecha_apertura)}</td>
+      <td><span class="badge ${v.status}"><span class="dot"></span>${v.status}</span></td>
+    </tr>`).join('')}
+    </tbody></table></div>`;
+  }
+}
+
+/* ---------- CONFIG ---------- */
+function renderConfigTab(){
+  if(!currentUser || currentUser.rol!=='admin') return;
+  const defaultClientes = ['AFIRME','HIMALAYA','LOS CAMPESTRES','VILLACERO','AUDI','ALFONSINO','COLEGIO NEXXUS','IOS','MG','ACERO PRIME','ABOGADOS','ALMAC. MEZQUITAL','Schening Industrias','Banco Shinhan','CONSTANCIO','FARMACIAS SAN PABLO','OTRA'];
+
+  document.getElementById('puestosList').innerHTML = config.puestos.map(p=>
+    `<span class="unit-tag" style="margin:0 6px 6px 0;display:inline-flex;align-items:center;gap:6px;">${p}
+      <button class="small-link" onclick="quitarPuesto('${p}')" style="color:var(--danger);">✕</button>
+    </span>`
+  ).join('') || '<p style="font-size:12.5px;color:var(--muted);">Aún no hay puestos en el catálogo — agrega el primero arriba.</p>';
+
+  renderUsuariosList();
+
+  document.getElementById('clientesList').innerHTML = config.clientes.map(c=>
+    `<span class="client-tag" style="margin:0 6px 6px 0;display:inline-flex;align-items:center;gap:6px;">${c}
+      ${defaultClientes.includes(c) ? '' : `<button class="small-link" onclick="quitarCliente('${c}')" style="color:var(--danger);">✕</button>`}
+    </span>`
+  ).join('');
+
+  document.getElementById('unidadesList').innerHTML = config.unidades.map(u=>
+    `<span class="unit-tag" style="margin:0 6px 6px 0;display:inline-flex;align-items:center;gap:6px;">${u}
+      ${['Aromatex','Pestex','Weldex'].includes(u) ? '' : `<button class="small-link" onclick="quitarUnidad('${u}')" style="color:var(--danger);">✕</button>`}
+    </span>`
+  ).join('');
+
+  document.getElementById('headcountForm').innerHTML = `<div class="form-grid">${
+    config.unidades.map(u=>`<div><label>${u}</label><input type="number" min="0" id="hc_${u.replace(/\s+/g,'_')}" value="${config.headcount[u]||''}" placeholder="0"></div>`).join('')
+  }</div>`;
+
+  document.getElementById('umbralAlerta').value = config.umbralAlerta || 7;
+}
+
+async function agregarPuesto(){
+  const val = document.getElementById('nuevoPuesto').value.trim();
+  if(!val) return;
+  if(config.puestos.includes(val)){ toast('Ese puesto ya existe'); return; }
+  config.puestos.push(val);
+  document.getElementById('nuevoPuesto').value='';
+  await saveConfig();
+  populateUnidadSelects();
+  renderConfigTab();
+  toast('Puesto agregado');
+}
+async function quitarPuesto(p){
+  config.puestos = config.puestos.filter(x=>x!==p);
+  await saveConfig();
+  populateUnidadSelects();
+  renderConfigTab();
+}
+
+async function agregarCliente(){
+  const val = document.getElementById('nuevoCliente').value.trim();
+  if(!val) return;
+  if(config.clientes.includes(val)){ toast('Ese cliente ya existe'); return; }
+  config.clientes.splice(config.clientes.length-1, 0, val);
+  document.getElementById('nuevoCliente').value='';
+  await saveConfig();
+  populateUnidadSelects();
+  renderConfigTab();
+  toast('Cliente agregado');
+}
+async function quitarCliente(c){
+  config.clientes = config.clientes.filter(x=>x!==c);
+  await saveConfig();
+  populateUnidadSelects();
+  renderConfigTab();
+}
+async function guardarUmbral(){
+  const val = Number(document.getElementById('umbralAlerta').value) || 7;
+  config.umbralAlerta = val;
+  await saveConfig();
+  toast('Umbral de alerta guardado');
+  renderAlertas();
+}
+
+async function agregarUnidad(){
+  const val = document.getElementById('nuevaUnidad').value.trim();
+  if(!val) return;
+  if(config.unidades.includes(val)){ toast('Esa unidad ya existe'); return; }
+  config.unidades.push(val);
+  document.getElementById('nuevaUnidad').value='';
+  await saveConfig();
+  populateUnidadSelects();
+  renderConfigTab();
+  toast('Unidad agregada');
+}
+async function quitarUnidad(u){
+  config.unidades = config.unidades.filter(x=>x!==u);
+  delete config.headcount[u];
+  await saveConfig();
+  populateUnidadSelects();
+  renderConfigTab();
+}
+async function guardarHeadcount(){
+  config.unidades.forEach(u=>{
+    const el = document.getElementById('hc_'+u.replace(/\s+/g,'_'));
+    config.headcount[u] = Number(el.value)||0;
+  });
+  await saveConfig();
+  toast('Plantilla guardada');
+  renderDashboard();
+}
+
+/* ---------- USUARIOS ---------- */
+async function agregarUsuario(){
+  if(!currentUser || currentUser.rol!=='admin'){ toast('Solo un administrador puede crear usuarios'); return; }
+  const nombre = document.getElementById('nuevoUsuarioNombre').value.trim();
+  const email = normEmail(document.getElementById('nuevoUsuarioEmail').value);
+  const rol = document.getElementById('nuevoUsuarioRol').value;
+  if(!nombre || !validEmail(email)){ toast('Ingresa nombre y un correo corporativo válido'); return; }
+  const password = generatePassword();
+  try{
+    if(!secondaryApp){
+      secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
+    }
+    const cred = await secondaryApp.auth().createUserWithEmailAndPassword(email, password);
+    const uid = cred.user.uid;
+    await secondaryApp.auth().signOut();
+    await db.collection('usuarios').doc(uid).set({ nombre, email, rol, activo:true, creado: todayStr() });
+    document.getElementById('nuevoUsuarioNombre').value='';
+    document.getElementById('nuevoUsuarioEmail').value='';
+    mostrarPasswordGenerada({email, password});
+    toast('Usuario creado');
+  }catch(e){
+    console.error(e);
+    let msg = 'No se pudo crear el usuario.';
+    if(e.code==='auth/email-already-in-use') msg = 'Ya existe una cuenta con ese correo.';
+    toast(msg);
+  }
+}
+
+function mostrarPasswordGenerada(u){
+  document.getElementById('nuevaPasswordBox').innerHTML = `
+    <div class="pw-reveal">
+      <span>${u.email} → contraseña asignada: <strong>${u.password}</strong></span>
+      <button class="btn btn-sm btn-gold" onclick="copiarTexto('${u.password}')">Copiar</button>
+    </div>
+    <p style="font-size:11.5px;color:var(--muted);margin-top:6px;">Compártesela por un medio seguro — no volverá a mostrarse completa aquí.</p>`;
+}
+
+function copiarTexto(t){
+  navigator.clipboard?.writeText(t).then(()=>toast('Copiado al portapapeles')).catch(()=>toast('No se pudo copiar'));
+}
+
+async function resetPasswordUsuario(email){
+  if(!currentUser || currentUser.rol!=='admin') return;
+  try{
+    await auth.sendPasswordResetEmail(email);
+    toast('Se envió un correo a '+email+' para restablecer su contraseña');
+  }catch(e){ console.error(e); toast('No se pudo enviar el correo de restablecimiento'); }
+}
+
+async function toggleActivoUsuario(uid){
+  if(!currentUser || currentUser.rol!=='admin') return;
+  const u = usuarios.find(x=>x.id===uid);
+  if(!u) return;
+  if(u.rol==='admin' && u.activo!==false && usuarios.filter(x=>x.rol==='admin' && x.activo!==false).length<=1){
+    toast('Debe quedar al menos un administrador activo');
+    return;
+  }
+  try{ await db.collection('usuarios').doc(uid).update({ activo: u.activo===false ? true : false }); }
+  catch(e){ console.error(e); toast('No se pudo actualizar el usuario'); }
+}
+
+function renderUsuariosList(){
+  const el = document.getElementById('usuariosList');
+  if(!usuarios.length){ el.innerHTML = ''; return; }
+  el.innerHTML = usuarios.map(u=>`
+    <div class="user-row">
+      <div>
+        <strong>${u.nombre}</strong> <span class="role-badge" style="background:#EEF1F7;color:var(--navy-800);">${u.rol==='admin'?'Administrador':'Supervisor'}</span>
+        ${u.activo===false ? '<span class="badge cancelada">inactivo</span>' : ''}
+        <div style="font-size:12px;color:var(--muted);">${u.email}</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-sm btn-ghost" onclick="resetPasswordUsuario('${u.email}')">Enviar reset de contraseña</button>
+        <button class="btn btn-sm ${u.activo===false?'btn-gold':'btn-danger'}" onclick="toggleActivoUsuario('${u.id}')">${u.activo===false?'Activar':'Desactivar'}</button>
+      </div>
+    </div>`).join('');
+}
+
+/* ---------- NAV & ARRANQUE ---------- */
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    if(btn.dataset.role==='admin' && (!currentUser || currentUser.rol!=='admin')){ toast('Solo administradores pueden entrar aquí'); return; }
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+    if(btn.dataset.view==='reportes') renderReportes();
+  });
+});
+
+function renderAll(){
+  renderDashboard();
+  renderAlertas();
+  renderVacantesTab();
+  renderMovimientosTab();
+  if(currentUser && currentUser.rol==='admin') renderConfigTab();
+  if(document.getElementById('view-reportes').classList.contains('active')) renderReportes();
+}
+
+function updateClock(){
+  document.getElementById('clockDate').textContent = new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+document.getElementById('loginPassword').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('loginEmail').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('setupEmail').addEventListener('keydown', e=>{ if(e.key==='Enter') crearPrimerAdmin(); });
+
+updateClock();
+document.getElementById('vFecha').value = todayStr();
+document.getElementById('mFecha').value = todayStr();
+init();
+</script>
+</body>
+</html>
